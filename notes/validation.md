@@ -471,3 +471,7 @@ Business Profile and Search Console operations are outside this website update.
 ## 2026-10-28 — Review from Troy Petersen
 
 - Added Troy Petersen's 5-star review word for word (English; tags speed + design). RATED 11 → 12 (profile shows 12). check-site PASS.
+
+## 2026-11-06 — Bluetech moved to its own domain
+
+- Showcase address bar, tab, « Voir le site en ligne » link and live iframe now use https://bluetech-sarl.com/ (the github.io URL redirects there).
