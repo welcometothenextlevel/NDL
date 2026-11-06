@@ -475,3 +475,8 @@ Business Profile and Search Console operations are outside this website update.
 ## 2026-11-06 — Bluetech moved to its own domain
 
 - Showcase address bar, tab, « Voir le site en ligne » link and live iframe now use https://bluetech-sarl.com/ (the github.io URL redirects there).
+
+## 2026-11-06 (b) — Portfolio arrows
+
+- Owner: the arrows under the projects did nothing. drift() writes scrollLeft every frame, which cancelled the arrows' smooth scroll (only ~26 px of drift moved). A press now holds the drift for 3 s, and stepping past either end jumps to the matching card in the other set; wrap() is skipped while stepping or it undoes that jump.
+- Puppeteer 1440 and 390: next/prev move one card, prev from the first card loops to the last, next across the loop point works, drift resumes; « Voir le site » and « Aperçu en direct » respond. Assets v=20261106.

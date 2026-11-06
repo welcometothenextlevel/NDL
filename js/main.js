@@ -159,13 +159,13 @@
     viewport.appendChild(rail);
 
     // Slow continuous drift; pauses on hover, touch, focus, drag and while a live preview is open.
-    let paused = false, dragging = false, visible = false, raf = 0, last = 0;
+    let paused = false, stepping = false, stepTimer = 0, dragging = false, visible = false, raf = 0, last = 0;
     const half = () => rail.scrollWidth / 2;
     function tick(now) {
       raf = 0;
       const dt = last ? Math.min(now - last, 50) : 16.7; last = now;
-      if (!paused && !dragging && visible && !document.hidden && !reduced.matches && !$('iframe:not([hidden])', rail)) drift(viewport, dt * 0.028, half());
-      else wrap(viewport, half());
+      if (!paused && !stepping && !dragging && visible && !document.hidden && !reduced.matches && !$('iframe:not([hidden])', rail)) drift(viewport, dt * 0.028, half());
+      else if (!stepping) wrap(viewport, half());
       raf = requestAnimationFrame(tick);
     }
     const start = () => { if (!raf) { last = 0; raf = requestAnimationFrame(tick); } };
@@ -204,7 +204,17 @@
     viewport.addEventListener('touchend', () => { clearTimeout(touchTimer); touchTimer = setTimeout(() => { paused = false; }, 2500); }, { passive: true });
     viewport.addEventListener('touchcancel', () => { clearTimeout(touchTimer); touchTimer = setTimeout(() => { paused = false; }, 2500); }, { passive: true });
     if ('IntersectionObserver' in window) new IntersectionObserver(en => { visible = en[0].isIntersecting; if (visible) start(); }).observe(viewport); else { visible = true; start(); }
-    function move(direction) { viewport.scrollBy({ left: direction * ($('.wcard', rail).offsetWidth + 22), behavior: reduced.matches ? 'instant' : 'smooth' }); }
+    // An arrow press holds the drift for a moment: drift() writes scrollLeft every
+    // frame, which cancels a smooth scroll. Stepping past either end of the first
+    // set jumps to the same card in the other set first, so the loop never stops.
+    function move(direction) {
+      const step = $('.wcard', rail).offsetWidth + 22;
+      stepping = true; clearTimeout(stepTimer);
+      if (direction < 0 && viewport.scrollLeft < step) viewport.scrollLeft += half();
+      else if (direction > 0 && viewport.scrollLeft + step >= half()) viewport.scrollLeft -= half();
+      viewport.scrollBy({ left: direction * step, behavior: reduced.matches ? 'instant' : 'smooth' });
+      stepTimer = setTimeout(() => { stepping = false; }, 3000);
+    }
     $('[data-work-prev]')?.addEventListener('click', () => move(-1));
     $('[data-work-next]')?.addEventListener('click', () => move(1));
   }
