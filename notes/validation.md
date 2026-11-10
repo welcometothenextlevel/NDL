@@ -480,3 +480,10 @@ Business Profile and Search Console operations are outside this website update.
 
 - Owner: the arrows under the projects did nothing. drift() writes scrollLeft every frame, which cancelled the arrows' smooth scroll (only ~26 px of drift moved). A press now holds the drift for 3 s, and stepping past either end jumps to the matching card in the other set; wrap() is skipped while stepping or it undoes that jump.
 - Puppeteer 1440 and 390: next/prev move one card, prev from the first card loops to the last, next across the loop point works, drift resumes; « Voir le site » and « Aperçu en direct » respond. Assets v=20261106.
+
+## 2026-11-10 — /au/ landing page (branch au-page, not merged)
+
+- New standalone English page au/index.html + au/au.css + au/au.js for the AUD 499 Australian website offer, built from the owner's brief word for word. Does not load the French CSS/JS; fonts are the site's self-hosted Fraunces/Geist via ../assets/fonts. All paths relative.
+- Portfolio: 10 live client sites (brief's 8 + E&J Carpet Cleaning + All In 1 Party World, both checked live and finished), captured with puppeteer at 1440x900 and 390x844 into au/assets/portfolio/*.webp. Hero shows Trident in CSS device frames until au/assets/hero-mockup.png exists.
+- French site: only the hreflang pair in index.html and an « Australia (EN) » link in the shared footer (43 pages). check-site: au/ may be en-AU, show $ prices and use wa.me/61488894068; no page may show the old AU numbers.
+- Puppeteer at 360/390/768/1024/1440: no horizontal overflow (hidden labels in the scrollers had widened the phone layout until the scrollers were positioned), all images and fonts load, tap targets ≥44px, mobile WhatsApp bar never covers the footer. Contrast ≥4.5 for all text. Lighthouse mobile (local): 96 / 100 / 100 / 100.

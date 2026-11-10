@@ -29,8 +29,11 @@ for path in ROOT.rglob('*.html'):
     if '.git' in path.parts: continue
     page = Page(path.relative_to(ROOT)); text = path.read_text(); page.feed(text)
     # owner/ is an English ownership statement for a visa file, reachable only by its URL.
-    assert page.lang == ('en' if path.parent.name == 'owner' else 'fr-CH'), f'{path}: wrong language'
-    assert not re.search(r'\$\s*\d|\b(?:CHF|AUD)\s*\d|61425887683|en_AU|priceCurrency|priceRange', text), f'{path}: stale pricing/contact'
+    # au/ is the English landing page for Australia: en-AU, AUD prices, Australian WhatsApp number.
+    au = path.parent.name == 'au'
+    assert page.lang == ({'owner': 'en', 'au': 'en-AU'}.get(path.parent.name, 'fr-CH')), f'{path}: wrong language'
+    assert not re.search(r'61425887683|61488896075|488 896 075', text), f'{path}: old Australian number'
+    if not au: assert not re.search(r'\$\s*\d|\b(?:CHF|AUD)\s*\d|61425887683|en_AU|priceCurrency|priceRange', text), f'{path}: stale pricing/contact'
     # No public price: the free audit sets it (the proposal PDF carries the amounts).
     assert not re.findall(r'(\d[\d’\']*)\s*CHF', text), f'{path}: public CHF amount'
     if path.parent == ROOT:
@@ -41,8 +44,9 @@ for path in ROOT.rglob('*.html'):
 for path, page in pages.items():
     for link in page.links:
         url = urlsplit(link)
-        if url.scheme == 'tel': assert link == 'tel:+41762632817'
-        if url.netloc == 'wa.me': assert url.path == '/41762632817'
+        au = path.parent.name == 'au'
+        if url.scheme == 'tel': assert link == ('tel:+61488894068' if au else 'tel:+41762632817')
+        if url.netloc == 'wa.me': assert url.path == ('/61488894068' if au else '/41762632817'), f'{page.path}: wrong WhatsApp number'
         if url.scheme or url.netloc: continue
         target = ((ROOT / url.path.lstrip('/')) if url.path.startswith('/') else path.parent / url.path).resolve() if url.path else path
         if target.is_dir(): target /= 'index.html'
