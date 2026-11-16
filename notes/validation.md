@@ -487,3 +487,7 @@ Business Profile and Search Console operations are outside this website update.
 - Portfolio: 10 live client sites (brief's 8 + E&J Carpet Cleaning + All In 1 Party World, both checked live and finished), captured with puppeteer at 1440x900 and 390x844 into au/assets/portfolio/*.webp. Hero shows Trident in CSS device frames until au/assets/hero-mockup.png exists.
 - French site: only the hreflang pair in index.html and an « Australia (EN) » link in the shared footer (43 pages). check-site: au/ may be en-AU, show $ prices and use wa.me/61488894068; no page may show the old AU numbers.
 - Puppeteer at 360/390/768/1024/1440: no horizontal overflow (hidden labels in the scrollers had widened the phone layout until the scrollers were positioned), all images and fonts load, tap targets ≥44px, mobile WhatsApp bar never covers the footer. Contrast ≥4.5 for all text. Lighthouse mobile (local): 96 / 100 / 100 / 100.
+
+## 2026-11-16 — Portfolio: Mama Africa Beauty
+
+- Added https://mamaafrica-beauty.ch/ as the first portfolio card (« Tresses & soins · Payerne, Vaud » / EN « Braids & hair care · Payerne, Vaud »). Screenshot captured at 1280x889 into assets/work/mamaafrica(.webp|-sm.webp). main.js v=20261116. check-site PASS.
