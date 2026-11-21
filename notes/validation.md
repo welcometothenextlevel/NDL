@@ -491,3 +491,7 @@ Business Profile and Search Console operations are outside this website update.
 ## 2026-11-16 — Portfolio: Mama Africa Beauty
 
 - Added https://mamaafrica-beauty.ch/ as the first portfolio card (« Tresses & soins · Payerne, Vaud » / EN « Braids & hair care · Payerne, Vaud »). Screenshot captured at 1280x889 into assets/work/mamaafrica(.webp|-sm.webp). main.js v=20261116. check-site PASS.
+
+## 2026-11-21 — Portfolio: Noosa Food & Coffee Co
+
+- Added https://noosafoodandcoffeeco.com.au/ as the first card on /au/ (« Roasted coffee and raw honey · Noosa Heads QLD », desktop + mobile shots in au/assets/portfolio/noosa-*) and on the French portfolio (« Café torréfié et miel · Noosa, Queensland »; assets/work/noosa*). main.js v=20261121. Puppeteer 390/1440: images load, no overflow. check-site PASS.
