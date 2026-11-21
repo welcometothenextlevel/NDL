@@ -13,7 +13,7 @@
     drawer.classList.remove('is-open');
     drawer.inert = true;
     burger.setAttribute('aria-expanded', 'false');
-    burger.setAttribute('aria-label', 'Ouvrir le menu');
+    burger.setAttribute('aria-label', 'Open menu');
     document.body.classList.remove('is-locked');
     if (restoreFocus) burger.focus();
   }
@@ -22,7 +22,7 @@
     drawer.inert = false;
     drawer.classList.add('is-open');
     burger.setAttribute('aria-expanded', 'true');
-    burger.setAttribute('aria-label', 'Fermer le menu');
+    burger.setAttribute('aria-label', 'Close menu');
     document.body.classList.add('is-locked');
     $('a', drawer).focus();
   });
@@ -134,7 +134,7 @@
       const monogram = item.name.split(' ').slice(0, 2).map(w => w[0]).join('');
       const host = item.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
       const label = (EN ? 'Visit the site ' : 'Voir le site ') + item.name + (EN ? ' (new tab)' : ' (nouvel onglet)');
-      card.innerHTML = `<a class="project-shot" href="${item.url}" target="_blank" rel="noopener noreferrer" draggable="false" aria-label="${label}"><div class="project-shot__bar" aria-hidden="true"><i></i><i></i><i></i><span>${host}</span></div><img src="/assets/work/${item.img}-sm.webp" srcset="/assets/work/${item.img}-sm.webp 720w, /assets/work/${item.img}.webp 1280w" sizes="(max-width: 720px) 78vw, 350px" width="720" height="500" loading="lazy" decoding="async" draggable="false" alt="Page d’accueil du site ${item.name}"><span class="project-shot__num" aria-hidden="true">${monogram}</span><span class="project-shot__badge">Projet ${String(index + 1).padStart(2, '0')}</span></a><div class="wcard__meta"><div><b>${item.name}</b><span>${categories[index]}</span></div>${item.review ? `<a class="wcard__review" href="/avis#${item.review}" draggable="false"><svg viewBox="0 0 20 20" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M10 1.8l2.5 5.3 5.8.7-4.3 4 1.1 5.7L10 14.7l-5.1 2.8 1.1-5.7-4.3-4 5.8-.7z"/></svg>${EN ? 'Client review' : 'Avis client'}</a>` : ''}</div><div class="project-actions"><a href="${item.url}" target="_blank" rel="noopener noreferrer" draggable="false" aria-label="${label}">${EN ? 'Visit site' : 'Voir le site'} <svg class="ico" viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a><button type="button" aria-expanded="false">${EN ? 'Live preview' : 'Aperçu en direct'}</button></div>`;
+      card.innerHTML = `<a class="project-shot" href="${item.url}" target="_blank" rel="noopener noreferrer" draggable="false" aria-label="${label}"><div class="project-shot__bar" aria-hidden="true"><i></i><i></i><i></i><span>${host}</span></div><img src="/assets/work/${item.img}-sm.webp" srcset="/assets/work/${item.img}-sm.webp 720w, /assets/work/${item.img}.webp 1280w" sizes="(max-width: 720px) 78vw, 350px" width="720" height="500" loading="lazy" decoding="async" draggable="false" alt="Page d’accueil du site ${item.name}"><span class="project-shot__num" aria-hidden="true">${monogram}</span><span class="project-shot__badge">Projet ${String(index + 1).padStart(2, '0')}</span></a><div class="wcard__meta"><div><b>${item.name}</b><span>${categories[index]}</span></div>${item.review ? `<a class="wcard__review" href="/reviews#${item.review}" draggable="false"><svg viewBox="0 0 20 20" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M10 1.8l2.5 5.3 5.8.7-4.3 4 1.1 5.7L10 14.7l-5.1 2.8 1.1-5.7-4.3-4 5.8-.7z"/></svg>${EN ? 'Client review' : 'Avis client'}</a>` : ''}</div><div class="project-actions"><a href="${item.url}" target="_blank" rel="noopener noreferrer" draggable="false" aria-label="${label}">${EN ? 'Visit site' : 'Voir le site'} <svg class="ico" viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a><button type="button" aria-expanded="false">${EN ? 'Live preview' : 'Aperçu en direct'}</button></div>`;
       if (copy) { card.setAttribute('aria-hidden', 'true'); $$('a, button', card).forEach(el => { el.tabIndex = -1; }); }
       const toggle = $('button', card);
       toggle.addEventListener('click', () => {
@@ -278,9 +278,9 @@
     e.preventDefault();
     if (!form.reportValidity()) return;
     const data = Object.fromEntries(new FormData(form));
-    const message = 'Bonjour, je souhaite un audit gratuit pour mon entreprise.\n\nPrénom : ' + data.name.trim() + '\nEntreprise / activité : ' + data.business.trim() + (data.website.trim() ? '\nSite actuel : ' + data.website.trim() : '') + (data.message.trim() ? '\nMes clients aujourd’hui : ' + data.message.trim() : '');
-    $('[data-message-link]').href = 'https://wa.me/41762632817?text=' + encodeURIComponent(message);
-    $('[data-email-link]').href = 'mailto:contact@nextdigitalevel.com?subject=' + encodeURIComponent('Demande d’audit gratuit') + '&body=' + encodeURIComponent(message);
+    const message = 'Hi, I would like a free audit for my business.\n\nFirst name: ' + data.name.trim() + '\nBusiness / trade: ' + data.business.trim() + (data.website.trim() ? '\nCurrent website: ' + data.website.trim() : '') + (data.message.trim() ? '\nWhere my clients come from today: ' + data.message.trim() : '');
+    $('[data-message-link]').href = 'https://wa.me/61488894068?text=' + encodeURIComponent(message);
+    $('[data-email-link]').href = 'mailto:contact@nextdigitalevel.com?subject=' + encodeURIComponent('Free audit request') + '&body=' + encodeURIComponent(message);
     const ready = $('[data-message-ready]'); ready.hidden = false;
     $('[data-message-link]').focus();
   });

@@ -495,3 +495,11 @@ Business Profile and Search Console operations are outside this website update.
 ## 2026-11-21 — Portfolio: Noosa Food & Coffee Co
 
 - Added https://noosafoodandcoffeeco.com.au/ as the first card on /au/ (« Roasted coffee and raw honey · Noosa Heads QLD », desktop + mobile shots in au/assets/portfolio/noosa-*) and on the French portfolio (« Café torréfié et miel · Noosa, Queensland »; assets/work/noosa*). main.js v=20261121. Puppeteer 390/1440: images load, no overflow. check-site PASS.
+
+## 2026-11-21 (c) — Original design, translated to English for Australia
+
+- Owner rejected the landing-page replacement ("keep the old swiss design but just translate it"). Reverted d494ae6, then translated in place. Owner's choices: monthly client-acquisition offer, no public price, +61 488 894 068 everywhere, Swiss city pages replaced by Australian ones, keep "Swiss company" + flag.
+- Translation baked into the HTML (JS disabled, so nothing runtime is baked): the old i18n.js EN dictionary plus ~400 new strings, adapted for Australia (Swiss towns → Australian suburbs, francs → dollars, Swiss privacy law → Privacy Act 1988 / APPs / OAIC, address 475 Spencer St West Melbourne). i18n.js is now theme-only and sets NDL_LANG='en'; the FR/EN toggle is gone.
+- English URLs: reviews, local-seo, meta-ads, custom-design, custom-development, copywriting, mobile-websites, tracking-and-reporting, privacy. Old French URLs are noindex redirect stubs; the 7 agence-marketing-* and 18 creation-site-internet-* pages redirect to /marketing-agency-australia.
+- New scripts/build-cities-au.py: /marketing-agency-australia + Melbourne, Sydney, Brisbane, Gold Coast, Perth, Adelaide. French generators removed. reviews.py, offer.py, structured_data.py now English (French reviews shown in English with "Translated from French"); city ticker pins replace canton flags; review quotes “ ”.
+- Checks: check-site PASS (lang en-AU, AU numbers, links); puppeteer on all 27 real pages at 1440 and 390: no French text, no console errors, no overflow.

@@ -1720,9 +1720,9 @@ a.project-shot:focus-visible { outline: 2px solid var(--accent); outline-offset:
 .rv-card__text { margin: 0; font-size: 0.98rem; line-height: 1.6; color: var(--body); }
 .rv-card__text p { margin: 0; }
 .rv-card__text p + p { margin-top: 0.7em; }
-.rv-card__text p:first-child::before { content: '«\00a0'; color: var(--gold); }
+.rv-card__text p:first-child::before { content: '“'; color: var(--gold); }
 .rv-card__text[lang="en"] p:first-child::before { content: '“'; }
-.rv-card__text p:last-child::after { content: '\00a0»'; color: var(--gold); }
+.rv-card__text p:last-child::after { content: '”'; color: var(--gold); }
 .rv-card__text[lang="en"] p:last-child::after { content: '”'; }
 .rv-card figcaption { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid var(--hairline); }
 .rv-avatar {
@@ -2262,3 +2262,6 @@ a.project-shot:focus-visible { outline: 2px solid var(--accent); outline-offset:
 .showcase__try[aria-pressed="true"]::before { background: var(--accent); }
 .showcase:has(.showcase__site.is-live.is-on) .showcase__drag { opacity: 0; }
 .showcase__bar .showcase__try span { margin: 0; flex: none; padding: 0; background: none; border-radius: 0; font-size: inherit; letter-spacing: inherit; overflow: visible; }
+
+/* city ticker: a location pin in place of the old canton flags */
+.tk-pin { width: 0.95em; height: 0.95em; flex-shrink: 0; color: var(--accent); }

@@ -61,7 +61,7 @@
     if (!fine.matches || reduced.matches) return;
     const dot = document.createElement('div'); dot.className = 'cursor';
     const ring = document.createElement('div'); ring.className = 'cursor-ring';
-    ring.innerHTML = '<span>Voir</span>';
+    ring.innerHTML = '<span>View</span>';
     document.body.append(dot, ring);
     doc.classList.add('has-cursor', 'cursor--hidden');
     let x = -100, y = -100, rx = -100, ry = -100, raf = 0, shown = false;
@@ -520,7 +520,7 @@
   $$('.sector-links a').forEach((a, i) => a.style.setProperty('--i', i));
 
   /* ---------- Hero demo: click through the four steps ----------
-     Every click (a tile, "Étape suivante", or the screen itself) shows the
+     Every click (a tile, "Next step", or the screen itself) shows the
      next step with its own little animation. Left alone, a drawn cursor
      walks the visitor through it. */
   (function demo() {
@@ -535,7 +535,7 @@
       slides.forEach((sl, j) => { sl.classList.toggle('is-out', j === i && j !== k); sl.classList.toggle('is-on', j === k); });
       tiles.forEach((t, j) => t.setAttribute('aria-selected', String(j === k)));
       dots.forEach((d, j) => d.classList.toggle('is-on', j <= k));
-      if (count) count.textContent = 'Étape ' + (k + 1) + ' / ' + slides.length;
+      if (count) count.textContent = 'Step ' + (k + 1) + ' / ' + slides.length;
       i = k; clearTimeout(idle); clearTimeout(timer);
       if (manual === true) { touched = true; root.classList.add('is-touched'); }
       // manual interaction pauses the guided tour for a while; on touch devices there is no tour at all

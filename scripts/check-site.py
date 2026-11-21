@@ -28,15 +28,15 @@ pages = {}
 for path in ROOT.rglob('*.html'):
     if '.git' in path.parts: continue
     page = Page(path.relative_to(ROOT)); text = path.read_text(); page.feed(text)
-    # owner/ is an English ownership statement for a visa file, reachable only by its URL.
-    # au/ is the English landing page for Australia: en-AU, AUD prices, Australian WhatsApp number.
-    au = path.parent.name == 'au'
-    assert page.lang == ({'owner': 'en', 'au': 'en-AU'}.get(path.parent.name, 'fr-CH')), f'{path}: wrong language'
+    # The site is English for Australia. owner/ is the visa ownership statement
+    # (English, Swiss details on purpose); au/ is the $499 landing page.
+    owner, au = path.parent.name == 'owner', path.parent.name == 'au'
+    stub = 'http-equiv="refresh"' in text
+    assert page.lang == ('en' if owner else 'en-AU'), f'{path}: wrong language'
     assert not re.search(r'61425887683|61488896075|488 896 075', text), f'{path}: old Australian number'
-    if not au: assert not re.search(r'\$\s*\d|\b(?:CHF|AUD)\s*\d|61425887683|en_AU|priceCurrency|priceRange', text), f'{path}: stale pricing/contact'
-    # No public price: the free audit sets it (the proposal PDF carries the amounts).
-    assert not re.findall(r'(\d[\d’\']*)\s*CHF', text), f'{path}: public CHF amount'
-    if path.parent == ROOT:
+    if not owner: assert not re.search(r'41762632817|76 263 28 17', text), f'{path}: Swiss phone number'
+    if not au: assert not re.search(r'\$\s*\d|\b(?:CHF|AUD)\s*\d|priceCurrency|priceRange', text), f'{path}: public price'
+    if path.parent == ROOT and not stub and path.name != '404.html':
         assert page.h1 == 1, f'{path}: expected one h1'
         for token in ('rel="canonical"', 'property="og:title"', 'name="description"'):
             assert token in text, f'{path}: missing {token}'
@@ -44,9 +44,9 @@ for path in ROOT.rglob('*.html'):
 for path, page in pages.items():
     for link in page.links:
         url = urlsplit(link)
-        au = path.parent.name == 'au'
-        if url.scheme == 'tel': assert link == ('tel:+61488894068' if au else 'tel:+41762632817')
-        if url.netloc == 'wa.me': assert url.path == ('/61488894068' if au else '/41762632817'), f'{page.path}: wrong WhatsApp number'
+        if page.path.parent.name != 'owner':
+            if url.scheme == 'tel': assert link == 'tel:+61488894068', f'{page.path}: wrong phone {link}'
+            if url.netloc == 'wa.me': assert url.path == '/61488894068', f'{page.path}: wrong WhatsApp number'
         if url.scheme or url.netloc: continue
         target = ((ROOT / url.path.lstrip('/')) if url.path.startswith('/') else path.parent / url.path).resolve() if url.path else path
         if target.is_dir(): target /= 'index.html'
@@ -56,7 +56,7 @@ for path, page in pages.items():
         assert not (url.path.endswith('.html') and url.scheme == '' and url.netloc == ''), f'{page.path}: internal link keeps .html ({link})'
         if url.fragment and target in pages: assert unquote(url.fragment) in pages[target].ids, f'{page.path}: missing fragment {link}'
 home = (ROOT / 'index.html').read_text()
-for token in ('audit gratuit', 'exclusive', 'Sans engagement', 'Entreprise suisse', 'sans intermédiaire', 'Google Ads'):
+for token in ('free audit', 'exclusive', 'No lock-in contract', 'Swiss company', 'no middleman', 'Google Ads'):
     assert token in home, f'Missing offer: {token}'
 print(f'PASS: {len(pages)} HTML pages; links, fragments, metadata, JSON-LD, contact, offer, absence of prices.')
 
@@ -65,6 +65,7 @@ import sys as _sys; _sys.path.insert(0, str(ROOT / 'scripts'))
 import structured_data as _sd
 for path in sorted(ROOT.glob('*.html')):
     text = path.read_text(); slug = path.stem
+    if 'http-equiv="refresh"' in text: continue
     nodes = [json.loads(m.group(1)) for m in _sd.LD.finditer(text)]
     biz = [n for n in nodes if n.get('@type') == 'ProfessionalService']
     assert len(biz) == 1 and biz[0]['@id'] == _sd.BUSINESS_ID, f'{path.name}: expected one #business entity'

@@ -6,12 +6,12 @@
 Rules it enforces on every root page:
   * exactly one business entity, @id https://nextdigitalevel.com/#business,
     identical on every page so @id references resolve on the page itself;
-  * no street address in it (owner's instruction, 2026-10-01);
+  * no street address in it (owner's instruction, 2026-10-01; locality only);
   * every other node points at the business by @id only;
   * FAQPage is rebuilt from the FAQ the visitor can actually read, so the
     questions and answers match the visible text word for word;
-  * every /creation-site-internet-* page has a Service with the page's place
-    as areaServed (City for towns, AdministrativeArea for cantons);
+  * every /marketing-agency-* page has a Service with the page's city
+    (or Australia) as areaServed;
   * every indexable page except the homepage has a BreadcrumbList.
 """
 from pathlib import Path
@@ -20,7 +20,8 @@ import html, json, re, sys
 ROOT = Path(__file__).resolve().parent.parent
 SITE = 'https://nextdigitalevel.com'
 BUSINESS_ID = SITE + '/#business'
-CANTONS = ['Vaud', 'Genève', 'Fribourg', 'Neuchâtel', 'Valais', 'Jura']
+CITIES = [('Melbourne', 'Victoria'), ('Sydney', 'New South Wales'), ('Brisbane', 'Queensland'),
+          ('Gold Coast', 'Queensland'), ('Perth', 'Western Australia'), ('Adelaide', 'South Australia')]
 
 BUSINESS = {
     "@context": "https://schema.org",
@@ -31,87 +32,59 @@ BUSINESS = {
     "url": SITE + "/",
     "logo": SITE + "/assets/logo-mark-512.png",
     "image": SITE + "/assets/social-preview.png",
-    "description": ("Agence marketing de performance en Suisse romande. Next Digital Level garantit "
-                    "chaque mois un volume fixe d’appels, de demandes de devis ou de réservations aux "
-                    "entreprises éligibles, via Google Ads, le référencement local "
-                    "et la publicité Meta. Audit gratuit, sans engagement."),
-    "slogan": "Des appels, des devis, des réservations. Pour vous seul.",
-    "knowsAbout": ["Marketing de performance", "Génération de leads", "Google Ads", "Publicité Meta",
-                   "Référencement local", "SEO", "Création de site internet",
-                   "Acquisition de clients"],
-    "founder": {"@type": "Person", "name": "Amin Hamdi", "jobTitle": "Fondateur", "nationality": {"@type": "Country", "name": "Switzerland"}},
-    "telephone": "+41 76 263 28 17",
+    "description": ("Performance marketing agency for Australian businesses. Next Digital Level guarantees "
+                    "eligible businesses a fixed monthly volume of calls, quote requests or bookings, "
+                    "through Google Ads, local SEO and Meta advertising. Free audit, no lock-in contract."),
+    "slogan": "Calls, quotes, bookings. For you alone.",
+    "knowsAbout": ["Performance marketing", "Lead generation", "Google Ads", "Meta advertising",
+                   "Local SEO", "SEO", "Web design", "Client acquisition"],
+    "founder": {"@type": "Person", "name": "Amin Hamdi", "jobTitle": "Founder", "nationality": {"@type": "Country", "name": "Switzerland"}},
+    "telephone": "+61 488 894 068",
     "email": "contact@nextdigitalevel.com",
     "address": {
         "@type": "PostalAddress",
-        "addressLocality": "Chavannes-près-Renens",
-        "postalCode": "1022",
-        "addressRegion": "VD",
-        "addressCountry": "CH",
+        "addressLocality": "West Melbourne",
+        "postalCode": "3003",
+        "addressRegion": "VIC",
+        "addressCountry": "AU",
     },
-    "areaServed": [{"@type": "AdministrativeArea", "name": c} for c in CANTONS],
+    "areaServed": [{"@type": "Country", "name": "Australia"}] + [{"@type": "City", "name": c} for c, _ in CITIES],
     "sameAs": [
         "https://www.instagram.com/nextdigitalevel/",
         "https://www.facebook.com/profile.php?id=61591099700363",
-        # Google Business Profile, linked at the owner's request on 2026-09-30.
         "https://www.google.com/maps/place/?q=place_id:ChIJDxHjKQyWSAkRY9ludK1MBZE",
     ],
-    "hasMap": "https://maps.google.com/?cid=10449842818249578851",
-    # Owner confirmed availability is 24/7; matches the Business Profile.
     "openingHoursSpecification": {
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         "opens": "00:00", "closes": "23:59",
     },
-    "knowsLanguage": ["fr", "en"],
-    "contactPoint": {"@type": "ContactPoint", "telephone": "+41 76 263 28 17",
-                     "contactType": "customer service", "availableLanguage": ["French", "English"]},
+    "knowsLanguage": ["en", "fr"],
+    "contactPoint": {"@type": "ContactPoint", "telephone": "+61 488 894 068",
+                     "contactType": "customer service", "availableLanguage": ["English", "French"]},
 }
 
-# areaServed for each local page: cantons are AdministrativeArea, towns are City.
-def city(name, canton):
+def city(name, state):
     return {"@type": "City", "name": name,
-            "containedInPlace": {"@type": "AdministrativeArea", "name": canton}}
-def canton(name):
-    return {"@type": "AdministrativeArea", "name": name}
+            "containedInPlace": {"@type": "AdministrativeArea", "name": state}}
 
-PLACES = {
-    'creation-site-internet-geneve': ('Genève', canton('Genève')),
-    'creation-site-internet-lausanne': ('Lausanne et le canton de Vaud', canton('Vaud')),
-    'creation-site-internet-fribourg': ('Fribourg', canton('Fribourg')),
-    'creation-site-internet-neuchatel': ('Neuchâtel', canton('Neuchâtel')),
-    'creation-site-internet-valais': ('Valais', canton('Valais')),
-    'creation-site-internet-jura': ('Jura', canton('Jura')),
-    'creation-site-internet-nyon': ('Nyon', city('Nyon', 'Vaud')),
-    'creation-site-internet-morges': ('Morges', city('Morges', 'Vaud')),
-    'creation-site-internet-vevey-montreux': ('Vevey et Montreux', [city('Vevey', 'Vaud'), city('Montreux', 'Vaud')]),
-    'creation-site-internet-yverdon': ('Yverdon-les-Bains', city('Yverdon-les-Bains', 'Vaud')),
-    'creation-site-internet-bulle': ('Bulle', city('Bulle', 'Fribourg')),
-    'creation-site-internet-martigny': ('Martigny', city('Martigny', 'Valais')),
-    'creation-site-internet-sierre': ('Sierre et Crans-Montana', [city('Sierre', 'Valais'), city('Crans-Montana', 'Valais')]),
-    'creation-site-internet-monthey': ('Monthey', city('Monthey', 'Valais')),
-    'creation-site-internet-la-chaux-de-fonds': ('La Chaux-de-Fonds', [city('La Chaux-de-Fonds', 'Neuchâtel'), city('Le Locle', 'Neuchâtel')]),
-    'creation-site-internet-suisse-romande': ('Suisse romande', [canton(c) for c in CANTONS]),
-    # Performance-marketing landing pages (scripts/build-agency.py)
-    'agence-marketing-suisse-romande': ('Suisse romande', [canton(c) for c in CANTONS], 'Marketing de performance'),
-    'agence-marketing-geneve': ('Genève', canton('Genève'), 'Marketing de performance'),
-    'agence-marketing-lausanne': ('Lausanne et le canton de Vaud', [city('Lausanne', 'Vaud'), canton('Vaud')], 'Marketing de performance'),
-    'agence-marketing-fribourg': ('Fribourg', canton('Fribourg'), 'Marketing de performance'),
-    'agence-marketing-neuchatel': ('Neuchâtel', canton('Neuchâtel'), 'Marketing de performance'),
-    'agence-marketing-valais': ('Valais', canton('Valais'), 'Marketing de performance'),
-    'agence-marketing-jura': ('Jura', canton('Jura'), 'Marketing de performance'),
-}
+# Performance-marketing city pages (scripts/build-cities-au.py)
+PLACES = {'marketing-agency-australia': ('Australia', {"@type": "Country", "name": "Australia"}, 'Performance marketing')}
+for _c, _s in CITIES:
+    PLACES['marketing-agency-' + _c.lower().replace(' ', '-')] = (_c, city(_c, _s), 'Performance marketing')
 
-# Breadcrumb names for pages that had none: the same labels the footer uses.
+# Breadcrumb names: the same labels the footer uses.
 CRUMB_NAMES = {
-    'websites': 'L’offre',
-    'advertising': 'Nos canaux',
-    'book': 'Audit gratuit',
-    'tradie-websites': 'Artisans & services',
-    'beauty-salon-websites': 'Salons & instituts',
-    'ndis-provider-websites': 'Expérience NDIS en Australie',
-    'web-design-melbourne': 'Notre expérience australienne',
-    'website-cost-australia': 'Préparer votre projet',
+    'websites': 'The offer',
+    'advertising': 'Our channels',
+    'book': 'Free audit',
+    'reviews': 'Client reviews',
+    'privacy': 'Privacy policy',
+    'tradie-websites': 'Tradies & service businesses',
+    'beauty-salon-websites': 'Salons & clinics',
+    'ndis-provider-websites': 'NDIS experience in Australia',
+    'web-design-melbourne': 'Our Australian experience',
+    'website-cost-australia': 'Planning your project',
 }
 NO_CRUMB = {'index', '404'}
 
@@ -168,11 +141,7 @@ def process(path, check=False):
         if t == 'Service' and slug in PLACES:
             continue                                  # rebuilt from PLACES
         if t == 'BreadcrumbList':
-            items = d.get('itemListElement') or []
-            # Generators copy <head> from websites.html; a breadcrumb that ends on
-            # another page is an inherited stray, not this page's trail.
-            if not items or items[-1].get('item') != '%s/%s' % (SITE, slug):
-                continue
+            continue                                  # rebuilt below, in English
         if t == 'Service':
             d['provider'] = {"@id": BUSINESS_ID}
         if t == 'WebSite':
@@ -182,10 +151,10 @@ def process(path, check=False):
     new = [render(BUSINESS)]
     if slug in PLACES:
         label, area = PLACES[slug][:2]
-        stype = PLACES[slug][2] if len(PLACES[slug]) > 2 else "Création de site internet"
+        stype = PLACES[slug][2] if len(PLACES[slug]) > 2 else "Web design"
         new.append(render({"@context": "https://schema.org", "@type": "Service",
                            "serviceType": stype,
-                           "name": stype + " — " + label,
+                           "name": stype + " in " + label,
                            "provider": {"@id": BUSINESS_ID},
                            "areaServed": area,
                            "url": "%s/%s" % (SITE, slug)}))
@@ -194,12 +163,10 @@ def process(path, check=False):
         new.append(render({"@context": "https://schema.org", "@type": "FAQPage",
                            "mainEntity": [{"@type": "Question", "name": q,
                                            "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}))
-    has_crumb = any(d and d.get('@type') == 'BreadcrumbList' and (d.get('itemListElement') or [{}])[-1].get('item') == '%s/%s' % (SITE, slug)
-                    for _, d in blocks)
-    if not has_crumb and slug not in NO_CRUMB:
+    if slug not in NO_CRUMB:
         name = CRUMB_NAMES.get(slug) or html.unescape(re.search(r'<title>(.*?)</title>', page).group(1)).split(' | ')[0].split(' · ')[0]
         new.append(render({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
-            {"@type": "ListItem", "position": 1, "name": "Accueil", "item": SITE + "/"},
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
             {"@type": "ListItem", "position": 2, "name": name, "item": "%s/%s" % (SITE, slug)}]}))
 
     # Rebuild: drop every old JSON-LD block, put the full set back where the first one was.
@@ -217,6 +184,8 @@ def main():
     check = '--check' in sys.argv
     changed = []
     for path in sorted(ROOT.glob('*.html')):
+        if 'http-equiv="refresh"' in path.read_text():
+            continue                                  # redirect stubs to the English pages
         did, faq, issues = process(path, check)
         if did:
             changed.append(path.name)
