@@ -495,3 +495,11 @@ Business Profile and Search Console operations are outside this website update.
 ## 2026-11-21 — Portfolio: Noosa Food & Coffee Co
 
 - Added https://noosafoodandcoffeeco.com.au/ as the first card on /au/ (« Roasted coffee and raw honey · Noosa Heads QLD », desktop + mobile shots in au/assets/portfolio/noosa-*) and on the French portfolio (« Café torréfié et miel · Noosa, Queensland »; assets/work/noosa*). main.js v=20261121. Puppeteer 390/1440: images load, no overflow. check-site PASS.
+
+## 2026-11-21 (b) — English-only site for Australia
+
+- Owner: no French version any more, Australian clients only. The /au/ page is now the home page (index.html; css/site.css, js/site.js, assets/portfolio/). hreflang and the « Suisse romande » link removed; canonical, og:url and JSON-LD point at https://nextdigitalevel.com/.
+- Every old French URL (43 root pages, pages/, recherche-ia/) and /au/ is a noindex redirect stub to /, so old links and Google results land on the new home. English 404. Sitemap = home only; llms.txt rewritten in English.
+- Removed the French-only code: css/style|motion|animations|chat, js/main|i18n|motion|scenes|chat, worker/ (the Cloudflare chat worker itself is still deployed), the page generators and assets/scene + assets/work. All recoverable from git history (last French commit fb43022).
+- owner/ kept as is (visa statement, Swiss details on purpose); its reviews link now /#reviews.
+- check-site.py rewritten for the English site. Puppeteer 360–1440: no overflow, no errors, all images/fonts load; redirects verified.
