@@ -1,81 +1,80 @@
-"""Dependency-free checks for nextdigitalevel.com (static, GitHub Pages).
-
-    python3 scripts/check-site.py
-
-The site is one English page for Australia (index.html) plus redirect stubs
-that keep the old French URLs landing on the home page, the unlisted
-owner/ statement and the 404 page.
-"""
+"""Dependency-free checks for the buildless GitHub Pages site."""
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlsplit, unquote
 import json, re
-
 ROOT = Path(__file__).resolve().parent.parent
-WA = '/61488894068'
-OLD_NUMBERS = r'61425887683|61488896075|488 896 075|41762632817|76 263 28 17'
-
-
 class Page(HTMLParser):
     def __init__(self, path):
         super().__init__(convert_charrefs=True)
-        self.path, self.ids, self.links, self.h1, self.lang = path, set(), [], 0, None
-        self.jsonld, self.buffer = False, ''
-
+        self.path, self.ids, self.links, self.h1 = path, set(), [], 0
+        self.jsonld, self.buffer, self.lang = False, '', None
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
         if tag == 'html': self.lang = a.get('lang')
         if a.get('id'):
-            assert a['id'] not in self.ids, f'{self.path}: duplicate id {a["id"]}'
+            assert a['id'] not in self.ids, f'{self.path}: duplicate ID'
             self.ids.add(a['id'])
         if tag == 'h1': self.h1 += 1
-        if tag == 'img': assert 'alt' in a, f'{self.path}: image without alt'
-        for key in ('href', 'src', 'srcset'):
-            if a.get(key):
-                self.links += [u.strip().split(' ')[0] for u in a[key].split(',')] if key == 'srcset' else [a[key]]
+        if tag == 'img': assert 'alt' in a, f'{self.path}: missing alt'
+        for key in ('href', 'src'):
+            if a.get(key): self.links.append(a[key])
         if tag == 'script' and a.get('type') == 'application/ld+json': self.jsonld, self.buffer = True, ''
-
     def handle_data(self, data):
         if self.jsonld: self.buffer += data
-
     def handle_endtag(self, tag):
         if tag == 'script' and self.jsonld: json.loads(self.buffer); self.jsonld = False
-
-
 pages = {}
 for path in ROOT.rglob('*.html'):
-    if '.git' in path.parts or 'notes' in path.parts: continue
-    text = path.read_text(); page = Page(path.relative_to(ROOT)); page.feed(text)
-    stub = 'http-equiv="refresh"' in text
-    assert page.lang == ('en' if path.parent.name == 'owner' else 'en-AU'), f'{path}: wrong language'
-    # owner/ is the visa ownership statement: it keeps the Swiss details on purpose.
-    if path.parent.name != 'owner': assert not re.search(OLD_NUMBERS, text), f'{path}: old phone number'
-    assert '—' not in text or stub or path.parent.name == 'owner', f'{path}: em dash in copy'
-    if stub:
-        assert 'url=/"' in text and 'noindex' in text, f'{path}: redirect stub must point at / and be noindex'
-    elif path.name != '404.html' and path.parent.name != 'owner':
+    if '.git' in path.parts: continue
+    page = Page(path.relative_to(ROOT)); text = path.read_text(); page.feed(text)
+    # owner/ is an English ownership statement for a visa file, reachable only by its URL.
+    # au/ is the English landing page for Australia: en-AU, AUD prices, Australian WhatsApp number.
+    au = path.parent.name == 'au'
+    assert page.lang == ({'owner': 'en', 'au': 'en-AU'}.get(path.parent.name, 'fr-CH')), f'{path}: wrong language'
+    assert not re.search(r'61425887683|61488896075|488 896 075', text), f'{path}: old Australian number'
+    if not au: assert not re.search(r'\$\s*\d|\b(?:CHF|AUD)\s*\d|61425887683|en_AU|priceCurrency|priceRange', text), f'{path}: stale pricing/contact'
+    # No public price: the free audit sets it (the proposal PDF carries the amounts).
+    assert not re.findall(r'(\d[\d’\']*)\s*CHF', text), f'{path}: public CHF amount'
+    if path.parent == ROOT:
         assert page.h1 == 1, f'{path}: expected one h1'
         for token in ('rel="canonical"', 'property="og:title"', 'name="description"'):
             assert token in text, f'{path}: missing {token}'
     pages[path.resolve()] = page
-
 for path, page in pages.items():
     for link in page.links:
         url = urlsplit(link)
-        if page.path.parent.name != 'owner':
-            if url.scheme == 'tel': assert link == 'tel:+61488894068', f'{page.path}: wrong phone {link}'
-            if url.netloc == 'wa.me': assert url.path == WA, f'{page.path}: wrong WhatsApp number {link}'
-        if url.scheme or url.netloc or link.startswith('#') and not url.path:
-            if url.fragment and not url.path and not url.scheme: assert unquote(url.fragment) in page.ids, f'{page.path}: missing #{url.fragment}'
-            continue
-        target = (ROOT / url.path.lstrip('/')) if url.path.startswith('/') else (path.parent / url.path)
-        target = target.resolve()
+        au = path.parent.name == 'au'
+        if url.scheme == 'tel': assert link == ('tel:+61488894068' if au else 'tel:+41762632817')
+        if url.netloc == 'wa.me': assert url.path == ('/61488894068' if au else '/41762632817'), f'{page.path}: wrong WhatsApp number'
+        if url.scheme or url.netloc: continue
+        target = ((ROOT / url.path.lstrip('/')) if url.path.startswith('/') else path.parent / url.path).resolve() if url.path else path
         if target.is_dir(): target /= 'index.html'
+        # Links are extension-less; GitHub Pages serves /foo from foo.html.
+        if not target.exists() and target.with_suffix('.html').exists(): target = target.with_suffix('.html')
         assert target.exists(), f'{page.path}: missing {link}'
-        if url.fragment and target in pages: assert unquote(url.fragment) in pages[target].ids, f'{page.path}: missing {link}'
-
+        assert not (url.path.endswith('.html') and url.scheme == '' and url.netloc == ''), f'{page.path}: internal link keeps .html ({link})'
+        if url.fragment and target in pages: assert unquote(url.fragment) in pages[target].ids, f'{page.path}: missing fragment {link}'
 home = (ROOT / 'index.html').read_text()
-for token in ('$499', 'wa.me/61488894068', 'Built before you pay', 'Rated 5 stars on Google'):
-    assert token in home, f'home page lost: {token}'
-assert not re.search(r'AggregateRating|"Review"', home), 'no rating or review markup'
-print(f'PASS: {len(pages)} HTML pages; links, ids, language, phone numbers, redirects.')
+for token in ('audit gratuit', 'exclusive', 'Sans engagement', 'Entreprise suisse', 'sans intermédiaire', 'Google Ads'):
+    assert token in home, f'Missing offer: {token}'
+print(f'PASS: {len(pages)} HTML pages; links, fragments, metadata, JSON-LD, contact, offer, absence of prices.')
+
+# Structured data invariants (owned by scripts/structured_data.py).
+import sys as _sys; _sys.path.insert(0, str(ROOT / 'scripts'))
+import structured_data as _sd
+for path in sorted(ROOT.glob('*.html')):
+    text = path.read_text(); slug = path.stem
+    nodes = [json.loads(m.group(1)) for m in _sd.LD.finditer(text)]
+    biz = [n for n in nodes if n.get('@type') == 'ProfessionalService']
+    assert len(biz) == 1 and biz[0]['@id'] == _sd.BUSINESS_ID, f'{path.name}: expected one #business entity'
+    assert 'streetAddress' not in biz[0]['address'], f'{path.name}: street address must stay out of the schema'
+    assert '#organization' not in text, f'{path.name}: stale #organization reference'
+    visible = _sd.visible_faq(text)
+    faq = [n for n in nodes if n.get('@type') == 'FAQPage']
+    if visible:
+        got = [(q['name'], q['acceptedAnswer']['text']) for q in faq[0]['mainEntity']] if len(faq) == 1 else None
+        assert got == visible, f'{path.name}: FAQPage does not match the visible FAQ word for word'
+    if slug in _sd.PLACES:
+        assert any(n.get('@type') == 'Service' and n.get('provider') == {'@id': _sd.BUSINESS_ID} for n in nodes), f'{path.name}: local page needs a Service'
+print('PASS: structured data — one #business entity, no street address, FAQ schema matches visible text.')

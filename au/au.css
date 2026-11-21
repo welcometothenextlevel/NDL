@@ -1,6 +1,7 @@
-/* Next Digital Level · nextdigitalevel.com (Australia).
-   One light stylesheet for the whole site, so it loads fast for visitors
-   arriving from Facebook and Instagram on phones. Mobile first. */
+/* Next Digital Level · Australia landing page (/au/).
+   Standalone on purpose: it does not load the French site's CSS/JS, so it
+   stays light for visitors arriving from Facebook and Instagram on phones.
+   Tokens are copied from css/style.css. Mobile first. */
 
 @font-face { font-family: "Fraunces"; font-style: normal; font-weight: 100 900; font-display: swap; src: url(../assets/fonts/fraunces.woff2) format("woff2"); }
 @font-face { font-family: "Fraunces"; font-style: italic; font-weight: 100 900; font-display: swap; src: url(../assets/fonts/fraunces-italic.woff2) format("woff2"); }
