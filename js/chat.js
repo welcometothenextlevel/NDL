@@ -143,13 +143,13 @@
       <header class="chat__head">
         <span class="chat__avatar" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M8 21.5 13.6 15.4 17.6 19.4 24 11" stroke="#f7f4ee" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 11h-4.7M24 11v4.7" stroke="#c9a227" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <div class="chat__title"><b>${EN_UI ? 'NDL Assistant' : 'Assistant NDL'}</b><small>${EN_UI ? 'Online · replies in seconds' : 'En ligne · répond en quelques secondes'}</small></div>
-        <button class="chat__close" type="button" aria-label="Fermer l’assistant">×</button>
+        <button class="chat__close" type="button" aria-label="Close the assistant">×</button>
       </header>
       <div class="chat__log" role="log" aria-live="polite"></div>
       <div class="chat__chips"></div>
       <form class="chat__form">
-        <input class="chat__input" type="text" name="q" placeholder="${EN_UI ? 'Ask your question…' : 'Posez votre question…'}" autocomplete="off" maxlength="400" aria-label="Votre question">
-        <button class="chat__send" type="submit" aria-label="Envoyer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <input class="chat__input" type="text" name="q" placeholder="${EN_UI ? 'Ask your question…' : 'Posez votre question…'}" autocomplete="off" maxlength="400" aria-label="Your question">
+        <button class="chat__send" type="submit" aria-label="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </form>
       <p class="chat__foot">${EN_UI ? 'Your messages are not stored. For a direct chat: WhatsApp or phone.' : 'Vos messages ne sont pas conservés. Pour un échange direct : WhatsApp ou téléphone.'}</p>
     </section>`;

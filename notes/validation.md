@@ -507,3 +507,7 @@ Business Profile and Search Console operations are outside this website update.
 ## 2026-11-24 — Portfolio: Care United Group
 
 - Added https://www.cugndis.com.au/ as the first project on the home page (« NDIS provider · Auburn, Sydney », assets/work/careunited*) and on /au/ (« NDIS provider · Auburn NSW », au/assets/portfolio/careunited-*). main.js v=20261124. Puppeteer 1440/390: images load, no overflow, no errors. check-site PASS.
+
+## 2026-11-24 (b) — French leftovers missed on 2026-11-21
+
+- The 2026-11-21 "no French" check only matched accents and a short stopword list, so ~25 short labels (service-page headings, alt texts, og:title on book) plus the « Projet » card badge and chat aria-labels stayed French. Found by dumping every string that never went through a translation, and by checking rendered words against /usr/share/dict/words. All translated; main.js/chat.js v=20261124b.
