@@ -503,3 +503,7 @@ Business Profile and Search Console operations are outside this website update.
 - English URLs: reviews, local-seo, meta-ads, custom-design, custom-development, copywriting, mobile-websites, tracking-and-reporting, privacy. Old French URLs are noindex redirect stubs; the 7 agence-marketing-* and 18 creation-site-internet-* pages redirect to /marketing-agency-australia.
 - New scripts/build-cities-au.py: /marketing-agency-australia + Melbourne, Sydney, Brisbane, Gold Coast, Perth, Adelaide. French generators removed. reviews.py, offer.py, structured_data.py now English (French reviews shown in English with "Translated from French"); city ticker pins replace canton flags; review quotes “ ”.
 - Checks: check-site PASS (lang en-AU, AU numbers, links); puppeteer on all 27 real pages at 1440 and 390: no French text, no console errors, no overflow.
+
+## 2026-11-24 — Portfolio: Care United Group
+
+- Added https://www.cugndis.com.au/ as the first project on the home page (« NDIS provider · Auburn, Sydney », assets/work/careunited*) and on /au/ (« NDIS provider · Auburn NSW », au/assets/portfolio/careunited-*). main.js v=20261124. Puppeteer 1440/390: images load, no overflow, no errors. check-site PASS.
